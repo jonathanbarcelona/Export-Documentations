@@ -1,0 +1,324 @@
+| PROJECT NAME: *AMVAC (INDEX/POBOX)* |
+|-------------------------------------|
+
+PREFIX: *AMVAC*
+
+INDEX CAPTURE FIELDS AND RULES
+
+1. Vendor ID
+
+#+begin_quote
+Rules:
+#+end_quote
+
+1. Selected and returned from vendor file lookup where there is a UNIQUE
+   match on the vendor name and address fields (Street, City, State,
+   ZIP, Country). It is normal that vendor name will have multiple
+   records in the vendor file lookup. Select the vendor ID of the record
+   whose address matches the address indicated on the invoice.
+
+2. Capture Area Hierarchy:
+
+   1. Invoice Remit To address (or Make Payable To; or Send Payment To)
+
+   2. Invoice Letterhead address
+
+   3. Invoice Logo address
+
+3. If there is more than 1 match - leave Vendor ID field blank. Index
+   Vendor Name field.
+
+4. If there is no match - leave Vendor ID field blank. Index Vendor Name
+   field.
+
+5. If vendor name does NOT match but address matches - leave Vendor ID
+   field blank. Index Vendor Name field.
+
+6. If there is a unique vendor name match, but there is no vendor
+   address indicated on the invoice - leave Vendor ID field blank. Index
+   Vendor Name field.
+
+7. If there is a unique vendor name match but the street address is
+   empty in the data file - leave Vendor ID field blank. Index Vendor
+   Name field.
+
+8. If the only difference with the addresses in the database is the
+   4-digit ZIP code extension, then consider this as a match.
+   Example:“40218” is the zip code on the image; “40218-4506” is the zip
+   code in the vendor file.
+
+9. Address abbreviations are considered matches (St vs Street, Blvd vs
+   Boulevard). If the difference is due to an abbreviation, then
+   consider this as a match. Example: "Street" on the image; "St" in the
+   vendor file.
+
+10. For companies using a trade name, (i.e., DBA, AKA, etc.), the trade
+    name will sometimes be found in the street name address field of the
+    vendor file. Consider this as a match.
+
+#+begin_quote
+Example: On the invoice, the address is "PO Box 1774, New York, NY
+10156-1774". On the vendor file the address is "DBA: EQUINOX FITNESS
+CLUBS; PO BOX 1774, New York, NY 10156-1774".
+#+end_quote
+
+11. [@11] Validation Check: If Vendor ID field is populated, then Vendor
+    Name field should be blank (and vice-versa).
+
+2. [@2] Vendor Name
+
+   1. Only index Vendor Name if a unique match for Vendor ID is NOT
+      available.
+
+   2. Capture Area Hierarchy:
+
+      1. Invoice Remit To address (or Make Payable To; or Send Payment
+         To)
+
+      2. Invoice Letterhead address
+
+      3. Invoice Logo address
+
+   3. Validation Check: If Vendor ID field is populated, then Vendor
+      Name field should be blank (and vice-versa).
+
+3. Invoice Date
+
+   1. Format as, “YYYYMMDD”.
+
+   2. Rule: The first M will have 0 (zero) stored as the value if a
+      single digit month is entered. Rule 2: The first D will have 0
+      (zero) stored as the value if a single digit day is entered.
+
+   3. Leave blank if not available or not clear.
+
+   4. Capture future Invoice Date as shown.
+
+   5. For utility invoices where invoice date is missing, the ‘Period
+      To' date will be captured instead.
+
+   6. If there is no invoice date, then use CTI's date of indexing.
+
+   7. Key valid dates only, partial invoice dates are not keyed. If
+      invalid/partial, then use CTI's date of indexing.
+
+   8. *Rules for Normalizing Canadian/European Dates to US dates*
+
+      1. European date format (dd/mm/yyyy or yyyy/mm/dd) needs to be
+         normalized to US format (mm/dd/yyyy) when the data is labeled
+         dd/mm/yyyy or yyyy/mm/dd or dd/mm/yy or yy/mm/dd or its
+         spelled-out equivalent.
+
+      2. For European date formats that are unlabeled, and where the
+         month will be invalid (not 1-12) then the format is assumed to
+         be dd/mm/yyyy. Flip the date and month to normalize to US
+         format.
+
+      3. For European date formats that are unlabeled, but the year is
+         obviously listed first (yyyy/mm/dd or yy/mm/dd), then the date
+         is changed to have the year output last and the 2nd piece of
+         data output as the month, 3rd piece of data as the date. Should
+         the month be invalid, flip the date and month to normalize to
+         US format.
+
+      4. After normalization to US date format during the key entry
+         process, the date will be programmatically formatted and
+         written to the XML index file as yyyymmdd (this is the format
+         we use on all corcentric clients).
+
+4. Invoice Number
+
+   1. Capture as shown.
+
+   2. Invoice numbers listed as line items in a Statement of Account
+      will not be captured.
+
+   3. If invoice number is missing or illegible on the invoice but there
+      is an account number, use the account number concatenated/appended
+      with the invoice date in the MMDDYY format as the invoice number.
+      When indexing the account number enter alpha numeric entries only.
+      Do not enter special characters or spaces.
+
+   4. The Account Number may labeled as Customer Number.
+
+   5. If no invoice date is available to append to the Account Number,
+      use the date the document is indexed.
+
+   6. If there is no invoice number or account number, leave invoice
+      number blank.
+
+5. PO Number
+
+   1. Leave blank if illegible or not found.
+
+   2. PO Number format is usually AMnnnnn
+
+   3. Do not index “NA”, “N/A” and “Not Applicable”.
+
+   4. *UPDATE 03/18/2016* - In regard to the PO number field, please
+      look at both the Order Number and PO Number field - if the number
+      is AM and is followed by 5 digits, this needs to be indexed as the
+      PO number.
+
+6. Point of Contact
+
+   1. Leave blank if illegible or not found.
+
+   2. Capture name prefixes if shown (MS, MR, MRS, DR, etc.)
+
+   3. Some POCs may be departments like ACCOUNTS PAYABLE or branch
+      numbers such as C/O BRANCH # 239.
+
+   4. Typically found within the header of the invoice (BILL-TO address
+      block) referenced by words like attention to, contact or just a
+      person's name by itself within address section where the invoice
+      is sent to.
+
+   5. Acceptable Variations
+
+      1. Attn
+
+      2. Attn.
+
+      3. Attn to
+
+      4. Attention To
+
+      5. Contact
+
+      6. Contact Person
+
+   6.
+
+7. Invoice Total Amount
+
+   1. Leave blank if illegible.
+
+   2. If amount is crossed out, leave blank.
+
+   3. For credit amounts, capture with a negative (-) sign.
+
+   4. Debit Notes -- Positive Amount
+
+   5. Return Invoice -- Negative Amount
+
+   6. On utility bills/progressive invoices, it is common to have
+      current and past due charges where the total due is the sum of the
+      current and past charges. Being the past charges are on another
+      invoices, the rule is that if an invoice has current and past due
+      charges that we always capture the current charges and not the
+      total of the current and past due charges. Although this is mostly
+      on utility invoices this rule is for all invoices with current and
+      past due charges.
+
+   7. If an invoice has current and past due charges capture the current
+      charges and not the total of the current and past due charges.
+      Exception: if credits are applied and the amount due reflects
+      current charges with credits applied use the amount due. Integer
+      format with 2 decimals. No commas or $ signs used. Example:
+      10234000.86. Exception: Blank if not available.
+
+8. Tax
+
+   1. Field added 1/29/2016
+
+XML OUTPUT
+
+1. Vendor ID (VARCHAR (50)) -
+   Documents>InvoiceDocument>Invoice>InvoiceContacts>InvoiceContact>ContactType
+   = Vendor>Name
+
+2. Vendor Name (VARCHAR 50) -
+   Documents>InvoiceDocument>Invoice>InvoiceContacts>InvoiceContact>ContactType
+   = Vendor>Contact
+
+3. Invoice Date (YYYYMMDD) -
+   Documents>InvoiceDocument>Invoice>InvoiceDate
+
+4. Invoice Number (VARCHAR 30) -
+   Documents>InvoiceDocument>Invoice>InvoiceNumber
+
+5. PO Number (VARCHAR (30))-
+   Documents>InvoiceDocument>Invoice>PurchaseOrderNumber
+
+6. Point of Contact (VARCHAR 30) -
+   Documents>InvoiceDocument>Invoice>InvoiceContacts>InvoiceContact>ContactType
+   = ShipTo>Contact
+
+7. Invoice Total Amount (DECIMAL (2 PLACES)) -
+   Documents>InvoiceDocument>Invoice>InvoiceAmount
+
+8. Tax (DECIMAL (2 PLACES)) - Invoice>SalesTaxAmount
+
+INDEXING COMMENTS
+
+1. Client will also be passing prefixed PO number on invoices from
+   suppliers.
+
+2. Question: Are there certain formats (prefixes) for the PO numbers
+   that we should look out for?
+
+Answer: No, you should not be keeping an eye out for anything beyond
+your given scope to date. This piece is with the client.
+
+COMPANIES CONSIDERED AS AMVAC
+
+1. American Vanguard Corporation
+
+2. Amvac Chemical
+
+3. Gemchem
+
+4. Smartbox
+
+5. Amvac Netherlands
+
+VENDOR ID SELECTION (02/17/2015)
+
+1. If there are multiple matches on the vendor file for the vendor
+   name/address combination, then take note of the alpha character
+   suffix on the UNIQUE_VENDOR_NUMBER column of the vendor file.
+
+2. Match the SOLD TO/BILL TO entity on the invoice that corresponds to
+   the last 3 alpha characters.
+
+3. In this example, since the SOLD TO/BILL TO entity is GEM CHEM INC.,
+   this will correspond to *--GEM*, so we should select the first record
+   whose vendor number is 00050306-GEM.
+
+| VENDOR_NUMBER_DISP | UNIQUE_VENDOR_NUMBER | LOCATION | SITE_ID | VENDOR_NAME                  | STREET              | CITY    | STATE | ZIP        | COUNTRY | CATEGORY | VENDOR_GROUP | VENDOR_TYPE | TERMS  | COMPANY | CURRENCY |
+|--------------------+----------------------+----------+---------+------------------------------+---------------------+---------+-------+------------+---------+----------+--------------+-------------+--------+---------+----------|
+| 00050306           | 00050306-GEM         |          |         | Grain Processing Corporation | 25560 Network Place | Chicago | IL    | 60673-1255 | USA     |          |              | Default     | NET 45 |         | USD      |
+| 00763997           | 00763997-*AMV*       |          |         | GRAIN PROCESSING CORP        | 25560 NETWORK       | CHICAGO | IL    | 60673-1255 | USA     |          | CORP         | Default     |        |         | USD      |
+
+4. [@4] Here is the list of alpha suffixes and their corresponding Bill
+   To names:
+
+| *UNIQUE_VENDOR_NUMBER Suffix* | *Bill To Name*                | *Note*                                                                                                       |
+|-------------------------------+-------------------------------+--------------------------------------------------------------------------------------------------------------|
+| AMV                           | Amvac Chemical Corporation    |                                                                                                              |
+|                               |                               |                                                                                                              |
+|                               | Amvac Quimica Mexico          |                                                                                                              |
+|                               |                               |                                                                                                              |
+|                               | Amvac Quimical Mexico SRL     |                                                                                                              |
+| AVD                           | American Vanguard Corporation |                                                                                                              |
+| GEM                           | GemChem Inc                   |                                                                                                              |
+| NLD                           | Amvac Netherlands BV          |                                                                                                              |
+| QUIM                          | Amvac Quimica Mexico          | Do not use. When you see an invoice billed to Amvac Quimica or Amvac SRL, please use the vendor ID with AMV. |
+| SBX                           | Amvac Smartbox                |                                                                                                              |
+| SRL                           | Amvac Quimical Mexico SRL     | Do not use. When you see an invoice billed to Amvac Quimica or Amvac SRL, please use the vendor ID with AMV. |
+
+5. [@5] If you have a single unique match on the vendor file for the
+   vendor name/address, but the alpha suffix does not correspond to the
+   SOLD TO/BILL TO entity - *then use the vendor number from the single
+   unique match.*
+
+INVOICE SPECIFIC UPDATE 03/09/2015
+
+1. For this particular invoice, use the Order # as the Invoice Number.
+
+#+begin_quote
+[[file:media/image1.png]]
+#+end_quote
+
+2. [@2] 
